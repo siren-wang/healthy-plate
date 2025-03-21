@@ -12,8 +12,8 @@ import {
   Alert,
   Snackbar
 } from "@mui/material";
-import axios from "axios";
 import { AuthContext } from "../context/AuthContext";
+import api from "../api";
 
 export default function LoginPage() {
   const { login, logout } = useContext(AuthContext);
@@ -31,7 +31,7 @@ export default function LoginPage() {
     e.preventDefault();
     try {
       if (mode === "login") {
-        const res = await axios.post("/login", {
+        const res = await api.post("/login", {
           username,
           password,
         });
@@ -41,7 +41,7 @@ export default function LoginPage() {
         setMessage("Login successful.");
         navigate("/");
       } else {
-        await axios.post("/register", {
+        await api.post("/register", {
           username,
           email,
           password,
@@ -54,7 +54,7 @@ export default function LoginPage() {
         // 延迟执行登录
         setTimeout(async () => {
           try {
-            const res = await axios.post("/login", {
+            const res = await api.post("/login", {
               username,
               password,
             });
@@ -82,7 +82,7 @@ export default function LoginPage() {
     try {
       const token = localStorage.getItem("session_token");
       if (!token) return;
-      await axios.post("/logout", null, {
+      await api.post("/logout", null, {
         headers: { Authorization: `Bearer ${token}` },
       });
       logout(); // 清除 context

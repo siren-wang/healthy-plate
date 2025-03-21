@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import axios from "axios";
 import {
   Button,
   Box,
@@ -9,6 +8,7 @@ import {
   CardMedia,
   CardContent,
 } from "@mui/material";
+import api from '../api';
 import './index.css';
 
 export default function HealthyPlate() {
@@ -31,7 +31,7 @@ export default function HealthyPlate() {
         setUploading(true);
         setUploadProgress(0);
 
-        const response = await axios.post(
+        const response = await api.post(
           "/upload",
           {
             user_id: "1a2b3c4d5e6f7g8h9i0j",
