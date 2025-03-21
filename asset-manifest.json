@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/healthy-plate/static/css/main.7a3d3ed8.css",
+    "main.js": "/healthy-plate/static/js/main.9c9deaed.js",
+    "static/js/453.b3c3def7.chunk.js": "/healthy-plate/static/js/453.b3c3def7.chunk.js",
+    "index.html": "/healthy-plate/index.html",
+    "main.7a3d3ed8.css.map": "/healthy-plate/static/css/main.7a3d3ed8.css.map",
+    "main.9c9deaed.js.map": "/healthy-plate/static/js/main.9c9deaed.js.map",
+    "453.b3c3def7.chunk.js.map": "/healthy-plate/static/js/453.b3c3def7.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.7a3d3ed8.css",
+    "static/js/main.9c9deaed.js"
+  ]
+}
