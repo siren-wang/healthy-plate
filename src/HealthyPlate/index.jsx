@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import { useContext } from "react";
+import React, { useState, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import {
   Button,
@@ -9,15 +8,47 @@ import {
   Card,
   CardMedia,
   CardContent,
+  CircularProgress,
 } from "@mui/material";
-import api from '../api';
-import './index.css';
+import api from "../api";
+import "./index.css";
 
 export default function HealthyPlate() {
-    const { userId } = useContext(AuthContext);
+  const { userId } = useContext(AuthContext);
   const [imageUrl, setImageUrl] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [healthyScore, setHealthyScore] = useState(null);
+  const [checkingScore, setCheckingScore] = useState(false);
+
+  const pollForScore = async (imageKey) => {
+    setCheckingScore(true);
+    let attempts = 0;
+    const maxAttempts = 5;
+
+    while (attempts < maxAttempts) {
+      try {
+        const res = await api.post("/getAnalysis", {
+          user_id: userId,
+          image_key: imageKey,
+        });
+
+        if (res.data.healthy_score !== undefined) {
+          setHealthyScore(res.data.healthy_score);
+          setCheckingScore(false);
+          return;
+        }
+      } catch (err) {
+        console.log("Polling attempt", attempts + 1, "failed.");
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+      attempts++;
+    }
+
+    setCheckingScore(false);
+    setHealthyScore("Not available");
+  };
 
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
@@ -33,6 +64,8 @@ export default function HealthyPlate() {
       try {
         setUploading(true);
         setUploadProgress(0);
+        setHealthyScore(null);
+        setImageUrl(null);
 
         const response = await api.post(
           "/upload",
@@ -55,8 +88,9 @@ export default function HealthyPlate() {
           }
         );
 
-        const { image_url } = response.data;
+        const { image_url, image_key } = response.data;
         setImageUrl(image_url);
+        pollForScore(image_key);
       } catch (error) {
         console.error("Upload failed:", error);
       } finally {
@@ -76,7 +110,7 @@ export default function HealthyPlate() {
         Discover a balanced and nutritious lifestyle. We help you make informed
         food choices to support your health goals.
       </Typography>
-  
+
       <Box style={{ marginTop: "2rem" }}>
         <Button
           variant="contained"
@@ -92,7 +126,7 @@ export default function HealthyPlate() {
             onChange={handleImageUpload}
           />
         </Button>
-  
+
         {uploading && (
           <Box className="upload-progress">
             <LinearProgress variant="determinate" value={uploadProgress} />
@@ -102,7 +136,7 @@ export default function HealthyPlate() {
           </Box>
         )}
       </Box>
-  
+
       {imageUrl && (
         <Card className="upload-card">
           <CardMedia
@@ -116,10 +150,34 @@ export default function HealthyPlate() {
             <Typography variant="body2" color="text.secondary">
               Your image has been successfully uploaded!
             </Typography>
+
+            {checkingScore && (
+              <Box mt={2} display="flex" alignItems="center" justifyContent="center">
+                <CircularProgress size={20} sx={{ mr: 1 }} />
+                <Typography variant="body2">Analyzing your food...</Typography>
+              </Box>
+            )}
+
+            {!checkingScore && healthyScore !== null && (
+              <Typography variant="h6" sx={{ mt: 2 }}>
+                Healthy Score:{" "}
+                <span
+                  style={{
+                    color:
+                      healthyScore >= 70
+                        ? "green"
+                        : healthyScore >= 40
+                        ? "orange"
+                        : "red",
+                  }}
+                >
+                  {healthyScore}
+                </span>
+              </Typography>
+            )}
           </CardContent>
         </Card>
       )}
     </Box>
   );
-  
 }
