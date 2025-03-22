@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
 import {
   Button,
   Box,
@@ -12,6 +14,7 @@ import api from '../api';
 import './index.css';
 
 export default function HealthyPlate() {
+    const { userId } = useContext(AuthContext);
   const [imageUrl, setImageUrl] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -34,7 +37,7 @@ export default function HealthyPlate() {
         const response = await api.post(
           "/upload",
           {
-            user_id: "1a2b3c4d5e6f7g8h9i0j",
+            user_id: userId,
             file_extension: fileExtension,
             content_type: contentType,
             file_base64: base64Data,
